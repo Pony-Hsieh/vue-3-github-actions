@@ -5,6 +5,7 @@ on:
     paths-ignore:
       - '**/*.md'
       - 'learn/**'
+      - '.vscode/**'
 
 # 取得 github actions 的寫入權限；因為 JamesIves/github-pages-deploy-action@v4 需要寫入權限才能幫你將內容自動 commit 至 gh-pages 分支並 push 至此 repository
 permissions:
