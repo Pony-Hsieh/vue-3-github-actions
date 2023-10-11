@@ -1,0 +1,51 @@
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - '**/*.md'
+      - 'learn/**'
+
+# 取得 github actions 的寫入權限；因為 JamesIves/github-pages-deploy-action@v4 需要寫入權限才能幫你將內容自動 commit 至 gh-pages 分支並 push 至此 repository
+permissions:
+  contents: write
+
+jobs:
+  eslint-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install And Run Eslint Check
+        run: |
+          npm ci
+          npm run eslint-check
+
+  build-and-deploy:
+    needs: eslint-check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install and Build
+        run: |
+          npm ci
+          npm run build-only
+
+      - name: Copy index.html As 404 Page
+        run: cd ./dist && cp index.html 404.html
+
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          # 要 deploy 的資料夾
+          folder: dist
+          # 要發佈到哪個分支
+          branch: gh-pages # 預設值即為 gh-pages
